@@ -44,7 +44,7 @@ export default function FormLocacao({ filmes, fitas }: Props) {
           />
         </div>
 
-        {/* Filme */}
+        
         <div className="md:col-span-2">
           <label className="block text-xs font-medium text-neutral-700">
             Filme
