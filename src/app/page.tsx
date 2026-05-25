@@ -1,5 +1,7 @@
+import Link from "next/link";
 import FormLocacao from "./components/form_locacao";
 import FormFilme from "./components/form_filme";
+import FormFita from "./components/form_fita";
 import { getFilmes, getFitasDisponiveis, getTodasFitas } from "./actions";
 
 
@@ -17,9 +19,12 @@ export default async function AdminPage({
   ]);
 
   
-  const { edit } = await searchParams;
+  const { edit, editFita } = await searchParams;
   const filmeParaEditar = edit
     ? filmes.find((f) => f.cod_filme === Number(edit))
+    : undefined;
+  const fitaParaEditar = editFita
+    ? todasFitas.find((f) => f.cod_fita === Number(editFita))
     : undefined;
 
   return (
@@ -67,23 +72,25 @@ export default async function AdminPage({
             </section>
 
             <section className="rounded-lg border border-neutral-200 bg-white">
-              <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
-                <h2 className="text-base font-semibold tracking-tight">Fitas</h2>
-                <button
-                  type="button"
-                  className="inline-flex h-8 items-center gap-1 rounded-md border border-neutral-300 bg-white px-3 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  <span className="text-sm leading-none">+</span> Incluir
-                </button>
+              <header className="border-b border-neutral-200 px-6 py-4">
+                <h2 className="text-base font-semibold tracking-tight">
+                  {fitaParaEditar ? `Editando: Fita #${fitaParaEditar.cod_fita}` : "Fitas"}
+                </h2>
+                <p className="mt-0.5 text-xs text-neutral-500">
+                  {fitaParaEditar
+                    ? "Altere a situação e salve, ou cancele para voltar."
+                    : "Inclua uma nova fita no inventário."}
+                </p>
               </header>
-              <ul className="divide-y divide-neutral-100 max-h-96 overflow-y-auto">
+              <FormFita fitaToEdit={fitaParaEditar} key={fitaParaEditar?.cod_fita ?? "new"} />
+              <ul className="divide-y divide-neutral-100 max-h-64 overflow-y-auto border-t border-neutral-200">
                 {todasFitas.map((fita) => {
                   const tomCls: Record<string, string> = {
                     emerald: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
                     blue: "bg-blue-50 text-blue-700 ring-blue-600/20",
                   };
-                  const situacao = fita.sit_fita === "1" ? "Disponível" : "Locada";
-                  const tom = fita.sit_fita === "1" ? "emerald" : "blue";
+                  const situacao = String(fita.sit_fita).trim() === "1" ? "Disponível" : "Locada";
+                  const tom = String(fita.sit_fita).trim() === "1" ? "emerald" : "blue";
                   return (
                     <li
                       key={fita.cod_fita}
@@ -99,12 +106,12 @@ export default async function AdminPage({
                           {situacao}
                         </span>
                       </div>
-                      <button
-                        type="button"
+                      <Link
+                        href={`/?editFita=${fita.cod_fita}`}
                         className="text-xs font-medium text-neutral-700 hover:underline"
                       >
-                        Alterar situação
-                      </button>
+                        Alterar
+                      </Link>
                     </li>
                   );
                 })}

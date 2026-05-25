@@ -171,3 +171,54 @@ export async function alterarFilme(cod_filme: number, formData: FormData) {
       return { success: false, error: "Erro ao atualizar filme." };
     }
   }
+
+  export async function createFita(formData: FormData) {
+  const cod_filme = formData.get("cod_filme") as string;
+  const sit_fita = formData.get("sit_fita") as string;
+
+  if (!cod_filme || !sit_fita) {
+    console.error("❌ Erro: Filme e situação são obrigatórios.");
+    return { success: false, error: "Filme e situação são obrigatórios." };
+  }
+
+  try {
+    
+    const sqlInsertFita = `
+      INSERT INTO fita (cod_filme, sit_fita, dat_aquisicao)
+      VALUES ($1, $2, CURRENT_DATE)
+    `;
+    await query(sqlInsertFita, [parseInt(cod_filme, 10), sit_fita]);
+    console.log("✅ Fita incluída com sucesso!");
+    
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Erro ao criar fita:", error);
+    return { success: false, error: "Erro ao criar fita." };
+  }
+}
+
+export async function alterarSituacaoFita(cod_fita: number, formData: FormData) {
+  const sit_fita = formData.get("sit_fita") as string;
+
+  if (!sit_fita) {
+    console.error("❌ Erro: A situação da fita é obrigatória.");
+    return { success: false, error: "A situação da fita é obrigatória." };
+  }
+
+  try {
+    const sqlUpdateFita = `
+      UPDATE fita
+      SET sit_fita = $1
+      WHERE cod_fita = $2
+    `;
+    await query(sqlUpdateFita, [sit_fita, cod_fita]);
+    console.log("✅ Situação da fita atualizada com sucesso!");
+    
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Erro ao atualizar fita:", error);
+    return { success: false, error: "Erro ao atualizar fita." };
+  }
+}
