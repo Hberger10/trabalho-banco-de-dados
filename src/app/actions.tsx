@@ -2,6 +2,7 @@
 "use server";
 
 import { query } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 
 export interface Filme {
@@ -100,10 +101,73 @@ export async function createLocacao(formData: FormData) {
     await query(sqlUpdateFita, [parseInt(fitaId, 10)]);
 
     console.log("✅ Locação inserida e fita atualizada com sucesso!");
-    return { success: true }; // 4. Retorna sucesso
+    return { success: true }; 
 
   } catch (error) {
     console.error("❌ Erro ao criar locação:", error);
     return { success: false, error: "Erro ao criar locação." };
   }
 }
+
+export async function createFilme(formData: FormData) {
+  const nome = formData.get("nome") as string;
+  const cor = formData.get("cor") as string;
+  const genero = formData.get("genero") as string;
+
+    if (!nome || !cor || !genero) {
+    console.error("❌ Erro: Todos os campos são obrigatórios.");
+    return { success: false, error: "Todos os campos são obrigatórios." };
+  }
+
+    try {
+    const sqlInsertFilme = `
+      INSERT INTO filme (nom_filme, cod_cor, cod_genero)
+      VALUES ($1, $2, $3)
+    `;
+    await query(sqlInsertFilme, [nome, cor, parseInt(genero, 10)]);
+    console.log("✅ Filme inserido com sucesso!");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Erro ao criar filme:", error);
+    return { success: false, error: "Erro ao criar filme." };
+  }
+}
+export async function deleteFilme(cod_filme: number) {
+    try {
+    const sqlDeleteFilme = `
+      DELETE FROM filme WHERE cod_filme = $1
+    `;
+    await query(sqlDeleteFilme, [cod_filme]);
+    console.log("✅ Filme excluído com sucesso!");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Erro ao excluir filme:", error);
+    return { success: false, error: "Erro ao excluir filme." };
+  }
+}
+export async function alterarFilme(cod_filme: number, formData: FormData) {
+  const nome = formData.get("nome") as string;
+  const cor = formData.get("cor") as string;
+  const genero = formData.get("genero") as string;
+
+    if (!nome || !cor || !genero) {
+      console.error("❌ Erro: Todos os campos são obrigatórios.");
+      return { success: false, error: "Todos os campos são obrigatórios." };
+    }
+
+    try {
+      const sqlUpdateFilme = `
+        UPDATE filme
+        SET nom_filme = $1, cod_cor = $2, cod_genero = $3
+        WHERE cod_filme = $4
+      `;
+      await query(sqlUpdateFilme, [nome, cor, parseInt(genero, 10), cod_filme]);
+      console.log("✅ Filme atualizado com sucesso!");
+      revalidatePath("/");
+      return { success: true };
+    } catch (error) {
+      console.error("❌ Erro ao atualizar filme:", error);
+      return { success: false, error: "Erro ao atualizar filme." };
+    }
+  }

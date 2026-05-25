@@ -1,4 +1,5 @@
 import FormLocacao from "./components/form_locacao";
+import FormFilme from "./components/form_filme";
 import { getFilmes, getFitasDisponiveis, getTodasFitas } from "./actions";
 
 const [filmes, fitas, todasFitas] = await Promise.all([getFilmes(), getFitasDisponiveis(), getTodasFitas()]);
@@ -38,23 +39,11 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
            
             <section className="rounded-lg border border-neutral-200 bg-white">
-              <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
+              <header className="border-b border-neutral-200 px-6 py-4">
                 <h2 className="text-base font-semibold tracking-tight">Filmes</h2>
-                <button type="button" className="inline-flex h-8 items-center gap-1 rounded-md border border-neutral-300 bg-white px-3 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
-                  <span className="text-sm leading-none">+</span> Incluir
-                </button>
+                <p className="mt-0.5 text-xs text-neutral-500">Cadastre um novo filme no catálogo.</p>
               </header>
-              <ul className="divide-y divide-neutral-100 max-h-96 overflow-y-auto">
-                {filmes.map((filme) => (
-                  <li key={filme.cod_filme} className="flex items-center justify-between gap-3 px-6 py-3">
-                    <span className="truncate text-sm text-neutral-900">{filme.nom_filme}</span>
-                    <div className="flex items-center gap-3">
-                      <button type="button" className="text-xs font-medium text-neutral-700 hover:underline">Alterar</button>
-                      <button type="button" className="text-xs font-medium text-red-600 hover:underline">Excluir</button>
-                    </div>
-                  </li>
-                ))}
-</ul>
+              <FormFilme filmes={filmes} />
             </section>
 
             
