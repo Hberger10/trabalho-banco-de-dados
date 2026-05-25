@@ -17,6 +17,8 @@ export default function FormLocacao({ filmes, fitas }: Props) {
     (fita) => String(fita.cod_filme) === selectedFilmeId
   );
 
+  
+
   async function handleAction(formData: FormData) {
     setErro(null);
     const result = await createLocacao(formData);
@@ -63,7 +65,7 @@ export default function FormLocacao({ filmes, fitas }: Props) {
           </select>
         </div>
 
-        {/* Fita */}
+        
         <div className="md:col-span-2">
           <label className="block text-xs font-medium text-neutral-700">
             Fita
@@ -81,13 +83,13 @@ export default function FormLocacao({ filmes, fitas }: Props) {
             </option>
             {fitasFiltradas.map((fita) => (
               <option key={fita.cod_fita} value={String(fita.cod_fita)}>
-                {fita.num_fita}
+                {fita.cod_fita}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Datas */}
+        
         <div>
           <label className="block text-xs font-medium text-neutral-700">
             Data de retirada

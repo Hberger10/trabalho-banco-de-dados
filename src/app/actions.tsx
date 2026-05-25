@@ -14,7 +14,6 @@ export interface Filme {
 export interface Fita {
   cod_fita: number;
   cod_filme: number;
-  num_fita: string;
   sit_fita: string;
 }
 
@@ -31,8 +30,20 @@ export async function getFilmes(): Promise<Filme[]> {
 export async function getFitasDisponiveis(): Promise<Fita[]> {
   try {
     const res = await query(
-  "SELECT cod_fita, cod_filme, num_fita, sit_fita FROM fita WHERE sit_fita = '1' ORDER BY num_fita ASC"
+  "SELECT cod_fita, cod_filme, sit_fita FROM fita WHERE sit_fita = '1' ORDER BY cod_fita ASC"
 );
+    return res.rows;
+  } catch (error) {
+    console.error("Erro ao buscar fitas do banco:", error);
+    return [];
+  }
+}
+
+export async function getTodasFitas(): Promise<Fita[]> {
+  try {
+    const res = await query(
+      "SELECT cod_fita, cod_filme, sit_fita FROM fita ORDER BY cod_fita ASC"
+    );
     return res.rows;
   } catch (error) {
     console.error("Erro ao buscar fitas do banco:", error);
@@ -42,7 +53,7 @@ export async function getFitasDisponiveis(): Promise<Fita[]> {
 
 
 export async function createLocacao(formData: FormData) {
-  // 1. O 'as string' garante pro TypeScript que isso é um texto
+  
   const clienteNome = formData.get("clienteNome") as string;
   const fitaId = formData.get("fitaId") as string;
   const dataRetirada = formData.get("dataRetirada") as string;

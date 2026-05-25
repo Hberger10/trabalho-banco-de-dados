@@ -1,7 +1,7 @@
 import FormLocacao from "./components/form_locacao";
-import { getFilmes, getFitasDisponiveis } from "./actions";
+import { getFilmes, getFitasDisponiveis, getTodasFitas } from "./actions";
 
-const [filmes, fitas] = await Promise.all([getFilmes(), getFitasDisponiveis()]);
+const [filmes, fitas, todasFitas] = await Promise.all([getFilmes(), getFitasDisponiveis(), getTodasFitas()]);
 
 export default function AdminPage() {
   return (
@@ -44,17 +44,17 @@ export default function AdminPage() {
                   <span className="text-sm leading-none">+</span> Incluir
                 </button>
               </header>
-              <ul className="divide-y divide-neutral-100">
-                {["Cidade Encoberta", "O Último Verão", "Rota 09", "Caminhos Cruzados", "Pequenos Heróis"].map((titulo) => (
-                  <li key={titulo} className="flex items-center justify-between gap-3 px-6 py-3">
-                    <span className="truncate text-sm text-neutral-900">{titulo}</span>
+              <ul className="divide-y divide-neutral-100 max-h-96 overflow-y-auto">
+                {filmes.map((filme) => (
+                  <li key={filme.cod_filme} className="flex items-center justify-between gap-3 px-6 py-3">
+                    <span className="truncate text-sm text-neutral-900">{filme.nom_filme}</span>
                     <div className="flex items-center gap-3">
                       <button type="button" className="text-xs font-medium text-neutral-700 hover:underline">Alterar</button>
                       <button type="button" className="text-xs font-medium text-red-600 hover:underline">Excluir</button>
                     </div>
                   </li>
                 ))}
-              </ul>
+</ul>
             </section>
 
             
@@ -65,26 +65,22 @@ export default function AdminPage() {
                   <span className="text-sm leading-none">+</span> Incluir
                 </button>
               </header>
-              <ul className="divide-y divide-neutral-100">
-                {[
-                  { codigo: "FT-00148", situacao: "Disponível", tom: "emerald" },
-                  { codigo: "FT-00149", situacao: "Locada", tom: "blue" },
-                  { codigo: "FT-00207", situacao: "Manutenção", tom: "amber" },
-                  { codigo: "FT-00088", situacao: "Danificada", tom: "red" },
-                  { codigo: "FT-00312", situacao: "Disponível", tom: "emerald" },
-                ].map((fita) => {
+              <ul className="divide-y divide-neutral-100 max-h-96 overflow-y-auto">
+                {todasFitas.map((fita) => {
                   const tomCls: Record<string, string> = {
                     emerald: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
                     blue: "bg-blue-50 text-blue-700 ring-blue-600/20",
                     amber: "bg-amber-50 text-amber-800 ring-amber-600/20",
                     red: "bg-red-50 text-red-700 ring-red-600/20",
                   };
+                  const situacao = fita.sit_fita === "1" ? "Disponível" : "Locada";
+                  const tom = fita.sit_fita === "1" ? "emerald" : "blue";
                   return (
-                    <li key={fita.codigo} className="flex items-center justify-between gap-3 px-6 py-3">
+                    <li key={fita.cod_fita} className="flex items-center justify-between gap-3 px-6 py-3">
                       <div className="flex min-w-0 items-center gap-3">
-                        <span className="font-mono text-sm text-neutral-900">{fita.codigo}</span>
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${tomCls[fita.tom]}`}>
-                          {fita.situacao}
+                        <span className="font-mono text-sm text-neutral-900">Fita #{fita.cod_fita}</span>
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${tomCls[tom]}`}>
+                          {situacao}
                         </span>
                       </div>
                       <button type="button" className="text-xs font-medium text-neutral-700 hover:underline">Alterar situação</button>
