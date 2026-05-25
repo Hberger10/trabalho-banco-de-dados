@@ -1,48 +1,45 @@
-// components/form_locacao.tsx
+
 "use client";
 
 import { useState } from "react";
-import { createLocacao } from "../actions";
+import { createLocacao, type Filme, type Fita } from "../actions";
 
-// Mock temporário simulando dados do banco loc004
-const MOCK_FILMES = [
-  { id: "10", titulo: "Cidade Encoberta" },
-  { id: "20", titulo: "O Último Verão" },
-  { id: "30", titulo: "Rota 09" },
-];
+interface Props {
+  filmes: Filme[];
+  fitas: Fita[];
+}
 
-const MOCK_FITAS = [
-  { id: "101", filmeId: "10", codigo: "FT-00148 (Disponível)" },
-  { id: "102", filmeId: "10", codigo: "FT-00149 (Disponível)" },
-  { id: "201", filmeId: "20", codigo: "FT-00205 (Disponível)" },
-  { id: "301", filmeId: "30", codigo: "FT-00088 (Disponível)" },
-];
-
-export default function FormLocacao() {
+export default function FormLocacao({ filmes, fitas }: Props) {
   const [selectedFilmeId, setSelectedFilmeId] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
 
-  // Filtra as fitas baseado no filme selecionado
-  const fitasFiltradas = MOCK_FITAS.filter(
-    (fita) => fita.filmeId === selectedFilmeId
+  const fitasFiltradas = fitas.filter(
+    (fita) => String(fita.cod_filme) === selectedFilmeId
   );
 
+  async function handleAction(formData: FormData) {
+    setErro(null);
+    const result = await createLocacao(formData);
+    if (!result.success) {
+      setErro(result.error ?? "Erro desconhecido.");
+    }
+  }
+
   return (
-    <form action={createLocacao}>
+    <form action={handleAction}>
       <div className="grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-2">
-        {/* Cliente */}
+        
         <div className="md:col-span-2">
           <label className="block text-xs font-medium text-neutral-700">
             Cliente
           </label>
-          <select
-            name="clienteId"
+          <input
+            type="text"
+            name="clienteNome"
             required
+            placeholder="Nome do cliente"
             className="mt-1 flex h-10 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:outline-none"
-          >
-            <option value="">Selecione um cliente…</option>
-            <option value="1">Henrique Berger</option>
-            <option value="2">Gustavo Guidoni (Professor)</option>
-          </select>
+          />
         </div>
 
         {/* Filme */}
@@ -58,9 +55,9 @@ export default function FormLocacao() {
             className="mt-1 flex h-10 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:outline-none"
           >
             <option value="">Selecione o filme…</option>
-            {MOCK_FILMES.map((filme) => (
-              <option key={filme.id} value={filme.id}>
-                {filme.titulo}
+            {filmes.map((filme) => (
+              <option key={filme.cod_filme} value={String(filme.cod_filme)}>
+                {filme.nom_filme}
               </option>
             ))}
           </select>
@@ -83,8 +80,8 @@ export default function FormLocacao() {
                 : "Selecione um filme primeiro…"}
             </option>
             {fitasFiltradas.map((fita) => (
-              <option key={fita.id} value={fita.id}>
-                {fita.codigo}
+              <option key={fita.cod_fita} value={String(fita.cod_fita)}>
+                {fita.num_fita}
               </option>
             ))}
           </select>
@@ -114,6 +111,10 @@ export default function FormLocacao() {
           />
         </div>
       </div>
+
+      {erro && (
+        <p className="px-6 pb-2 text-sm text-red-600">{erro}</p>
+      )}
 
       <footer className="flex items-center justify-end border-t border-neutral-200 px-6 py-3">
         <button

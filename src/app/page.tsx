@@ -1,10 +1,7 @@
-
-
 import FormLocacao from "./components/form_locacao";
-import { getFilmes } from "./actions";
+import { getFilmes, getFitasDisponiveis } from "./actions";
 
-const filmes = await getFilmes();
-console.log("Filmes do banco:", filmes);
+const [filmes, fitas] = await Promise.all([getFilmes(), getFitasDisponiveis()]);
 
 export default function AdminPage() {
   return (
@@ -33,8 +30,7 @@ export default function AdminPage() {
               </p>
             </header>
 
-            
-            <FormLocacao />
+            <FormLocacao filmes={filmes} fitas={fitas} />
 
           </section>
 
@@ -61,7 +57,7 @@ export default function AdminPage() {
               </ul>
             </section>
 
-            {/* CARD 3 · FITAS */}
+            
             <section className="rounded-lg border border-neutral-200 bg-white">
               <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
                 <h2 className="text-base font-semibold tracking-tight">Fitas</h2>
