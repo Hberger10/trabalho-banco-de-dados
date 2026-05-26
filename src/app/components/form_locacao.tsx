@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createLocacao, type Filme, type Fita } from "../actions";
 
 interface Props {
@@ -10,25 +11,32 @@ interface Props {
 }
 
 export default function FormLocacao({ filmes, fitas }: Props) {
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [selectedFilmeId, setSelectedFilmeId] = useState("");
   const [erro, setErro] = useState<string | null>(null);
+  const [sucesso, setSucesso] = useState(false);
 
   const fitasFiltradas = fitas.filter(
     (fita) => String(fita.cod_filme) === selectedFilmeId
   );
 
-  
-
   async function handleAction(formData: FormData) {
     setErro(null);
+    setSucesso(false);
     const result = await createLocacao(formData);
-    if (!result.success) {
+    if (result.success) {
+      setSucesso(true);
+      formRef.current?.reset();
+      setSelectedFilmeId("");
+      router.refresh();
+    } else {
       setErro(result.error ?? "Erro desconhecido.");
     }
   }
 
   return (
-    <form action={handleAction}>
+    <form ref={formRef} action={handleAction}>
       <div className="grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-2">
         
         <div className="md:col-span-2">
@@ -114,6 +122,9 @@ export default function FormLocacao({ filmes, fitas }: Props) {
         </div>
       </div>
 
+      {sucesso && (
+        <p className="px-6 pb-2 text-sm text-green-600">✅ Locação realizada com sucesso!</p>
+      )}
       {erro && (
         <p className="px-6 pb-2 text-sm text-red-600">{erro}</p>
       )}

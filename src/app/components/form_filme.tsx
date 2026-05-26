@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createFilme, alterarFilme, deleteFilme, type Filme } from "../actions";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function FormFilme({ filmes: filmesIniciais, filmeParaEditar }: Props) {
+  const router = useRouter();
   const modoEdicao = !!filmeParaEditar;
 
   const [erro, setErro] = useState<string | null>(null);
@@ -25,6 +27,7 @@ export default function FormFilme({ filmes: filmesIniciais, filmeParaEditar }: P
       setErro(result.error ?? "Erro desconhecido.");
     } else {
       setSucesso(true);
+      router.refresh();
     }
   }
 

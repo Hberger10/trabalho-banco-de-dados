@@ -79,7 +79,7 @@ export async function createLocacao(formData: FormData) {
     const clienteId = clienteRes.rows[0].cod_cliente;
 
     const sqlInsertLocacao = `
-      INSERT INTO locacao (dat_locacao, cod_fita, cod_cliente, dat_devolucao, vlr_multa)
+      INSERT INTO locacao (dat_locacao, cod_fita, cod_cliente, dat_prevista_devolucao, val_locacao)
       VALUES ($1, $2, $3, $4, $5)
     `;
 
@@ -126,6 +126,7 @@ export async function createFilme(formData: FormData) {
     `;
     await query(sqlInsertFilme, [nome, cor, parseInt(genero, 10)]);
     console.log("✅ Filme inserido com sucesso!");
+    revalidatePath("/");
     return { success: true };
   } catch (error) {
     console.error("❌ Erro ao criar filme:", error);
